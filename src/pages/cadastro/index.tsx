@@ -54,6 +54,7 @@ export default function Cadastro() {
 
   const updateField = (e: ChangeEvent<HTMLInputElement>, field: string) => {
     setFormData({ ...formData, [field]: e.target.value });
+    console.log({ field });
 
     setErrors((prevErrors) =>
       prevErrors.map((error) =>
@@ -95,6 +96,23 @@ export default function Cadastro() {
             number: response.numero,
             neighborhood: response.bairro,
           }));
+
+          const addressInputs = [
+            'street',
+            'complement',
+            'city',
+            'state',
+            'number',
+            'neighborhood',
+          ];
+
+          setErrors((prevErrors) =>
+            prevErrors.map((error) =>
+              addressInputs.includes(error.field)
+                ? { ...error, message: '' }
+                : error,
+            ),
+          );
         }
       } catch (error) {
         console.error('Error fetching CEP data:', error);
