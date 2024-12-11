@@ -18,7 +18,7 @@ type DashBoardProps = {
 export default function Dashboard({ userList }: DashBoardProps) {
   return (
     <ProtectedRoute>
-      <div className="flex flex-col items-center justify-center w-full h-screen sm:w-auto sm:h-svh">
+      <div className="flex flex-col items-center justify-center w-full sm:w-auto">
         <div className="max-w-fit">
           <div className="flex flex-col justify-center items-center gap-[31px] sm:flex-row sm:justify-between rounded-md w-full pt-4 mb-5">
             <span className="text-xl font-bold">Informações de usuários</span>
