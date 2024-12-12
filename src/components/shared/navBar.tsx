@@ -72,7 +72,7 @@ export const NavBar = () => {
             </Button>
           </>
         )}
-        <Link href="https://genezys.io/#footer">
+        <Link href="https://genezys.io/#footer" target="_blank">
           <Button variant="ghost">Ajuda</Button>
         </Link>
 
