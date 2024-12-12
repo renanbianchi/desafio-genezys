@@ -1,8 +1,29 @@
-import { DataTable } from '@/components/ui/dataTable';
-import { columns } from '../../components/dashboard/columns';
-import { Button } from '@/components/ui/button';
-import { PlusIcon } from 'lucide-react';
 import ProtectedRoute from '@/components/shared/protectedRoute';
+import { Button } from '@/components/ui/button';
+import { DataTable } from '@/components/ui/dataTable';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { CircleX } from 'lucide-react';
+import { UserInputs } from '@/components/dashboard/UserInputs';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
+import { useAlert } from '@/hooks/useAlert';
+import { PlusIcon } from 'lucide-react';
+import { useState } from 'react';
+import { columns } from '../../components/dashboard/columns';
 
 type User = {
   id: string;
@@ -15,22 +36,152 @@ type DashBoardProps = {
   userList: User[];
 };
 
-export default function Dashboard({ userList }: DashBoardProps) {
+export default function Dashboard({
+  userList: initialUserList,
+}: DashBoardProps) {
+  const { showAlert } = useAlert();
+  const [userList, setUserList] = useState<User[]>(initialUserList);
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const [isEditingSheetOpen, setIsEditingSheetOpen] = useState(false);
+  const [user, setUser] = useState<User>({
+    id: crypto.randomUUID(),
+    name: '',
+    email: '',
+    address: '',
+  });
+
+  const handleAddUser = async () => {
+    setUserList((prevList) => [user, ...prevList]);
+
+    setUser({
+      id: crypto.randomUUID(),
+      name: '',
+      email: '',
+      address: '',
+    });
+
+    setIsPopoverOpen(false);
+    showAlert('success', 'Usuário adicionado com sucesso!');
+  };
+
+  const handleDeleteUser = (id: string) => {
+    setUserList((prevList) => prevList.filter((user) => user.id !== id));
+  };
+
+  const handleEditUser = async () => {
+    setUserList((prevList) =>
+      prevList.map((u) => (u.id === user.id ? { ...u, ...user } : u)),
+    );
+
+    setIsEditingSheetOpen(false);
+    showAlert('success', 'Usuário editado com sucesso!');
+  };
+
   return (
     <ProtectedRoute>
       <div className="flex flex-col items-center justify-center w-full sm:w-auto">
         <div className="max-w-fit">
           <div className="flex flex-col justify-center items-center gap-[31px] sm:flex-row sm:justify-between rounded-md w-full pt-4 mb-5">
             <span className="text-xl font-bold">Informações de usuários</span>
-            <Button
-              className="border-[#0F172A] text-sm max-w-40 sm:max-w-max"
-              variant="outline"
-            >
-              <PlusIcon />
-              Adicionar usuário
-            </Button>
+            <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  className="border-[#0F172A] text-sm max-w-40 sm:max-w-max"
+                  variant="outline"
+                >
+                  <PlusIcon />
+                  Adicionar usuário
+                </Button>
+              </PopoverTrigger>
+
+              <Sheet open={isEditingSheetOpen}>
+                <SheetTrigger asChild></SheetTrigger>
+                <SheetContent className="w-80 bg-white">
+                  <SheetHeader onClick={() => setIsEditingSheetOpen(false)}>
+                    <CircleX
+                      className="absolute right-4 top-4 bg-white cursor-pointer"
+                      onClick={() => setIsEditingSheetOpen(false)}
+                    />
+                    <SheetTitle>Editar Usuário</SheetTitle>
+                    <SheetDescription>
+                      Altere os dados do usuário aqui
+                    </SheetDescription>
+                  </SheetHeader>
+                  <div className="grid gap-4 py-4">
+                    {UserInputs.map((field, index) => (
+                      <div
+                        key={index}
+                        className="grid grid-cols-1 items-center gap-4"
+                      >
+                        <Label htmlFor={field.input} className="text-left">
+                          {field.label}
+                        </Label>
+                        <Input
+                          id={field.input}
+                          placeholder={field.placeholder}
+                          className="col-span-3"
+                          onChange={(e) =>
+                            setUser((prev) => ({
+                              ...prev,
+                              [field.input]: e.target.value,
+                            }))
+                          }
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  <SheetFooter>
+                    <SheetClose asChild>
+                      <Button onClick={handleEditUser}>
+                        Salvar alterações
+                      </Button>
+                    </SheetClose>
+                  </SheetFooter>
+                </SheetContent>
+              </Sheet>
+
+              <PopoverContent className="w-80 z-50">
+                <div className="grid gap-4">
+                  <div className="space-y-2">
+                    <h4 className="font-medium leading-none">Dados</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Insira os dados do usuário.
+                    </p>
+                  </div>
+                  <div className="grid gap-2 ">
+                    {UserInputs.map((field, index) => (
+                      <div
+                        key={index}
+                        className="grid grid-cols-1 items-center gap-0"
+                      >
+                        <Label htmlFor={field.input} className="text-left">
+                          {field.label}
+                        </Label>
+                        <Input
+                          id={field.input}
+                          placeholder={field.placeholder}
+                          className="col-span-2"
+                          onChange={(e) =>
+                            setUser((prev) => ({
+                              ...prev,
+                              [field.input]: e.target.value,
+                            }))
+                          }
+                        />
+                      </div>
+                    ))}
+                    <div className="grid grid-cols-1 items-center gap-0 mt-5">
+                      <Button onClick={handleAddUser}>Salvar</Button>
+                    </div>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
-          <DataTable columns={columns} data={userList} />
+          <DataTable
+            columns={columns(handleDeleteUser, setIsEditingSheetOpen, setUser)}
+            data={userList}
+          />
         </div>
       </div>
     </ProtectedRoute>

@@ -15,6 +15,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 
 import { ArrowUpDown } from 'lucide-react';
+import { Dispatch, SetStateAction } from 'react';
 
 export type User = {
   id: string;
@@ -23,7 +24,11 @@ export type User = {
   email: string;
 };
 
-export const columns: ColumnDef<User>[] = [
+export const columns = (
+  handleDeleteUser: (id: string) => void,
+  setIsEditingSheetOpen: Dispatch<SetStateAction<boolean>>,
+  setUser: Dispatch<SetStateAction<User>>,
+): ColumnDef<User>[] => [
   {
     id: 'select',
     header: ({ table }) => (
@@ -84,7 +89,7 @@ export const columns: ColumnDef<User>[] = [
   {
     id: 'actions',
     cell: ({ row }) => {
-      const payment = row.original;
+      const data = row.original;
 
       return (
         <DropdownMenu>
@@ -97,13 +102,22 @@ export const columns: ColumnDef<User>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Ações</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id)}
+              onClick={() => navigator.clipboard.writeText(data.id)}
             >
               Copiar ID de usuário
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Editar usuário</DropdownMenuItem>
-            <DropdownMenuItem>Excluir usuário</DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                setUser(data);
+                setIsEditingSheetOpen(true);
+              }}
+            >
+              Editar usuário
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleDeleteUser(data.id)}>
+              Excluir usuário
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );
