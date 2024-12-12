@@ -64,11 +64,17 @@ export const NavBar = () => {
                 Home
               </Button>
             </Link>
-            <Button variant="ghost">Perfil</Button>
-            <Button variant="ghost">Configurações</Button>
+            <Button className="hover:cursor-not-allowed" variant="ghost">
+              Perfil
+            </Button>
+            <Button className="hover:cursor-not-allowed" variant="ghost">
+              Configurações
+            </Button>
           </>
         )}
-        <Button variant="ghost">Ajuda</Button>
+        <Link href="https://genezys.io/#footer">
+          <Button variant="ghost">Ajuda</Button>
+        </Link>
 
         {location !== '/' && (
           <Button variant="ghost" onClick={handleButtonClick}>
