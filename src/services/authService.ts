@@ -1,7 +1,11 @@
 type userData = {
-  id: string;
   email: string;
   password: string;
+};
+
+type authPasswordTokenData = {
+  message?: string;
+  userId?: string;
 };
 
 type PasswordData = {
@@ -10,27 +14,7 @@ type PasswordData = {
   verifyPassword: string;
 };
 
-type postUserAuthenticateResponse = {
-  message?: string;
-  data?: Partial<userData>;
-  token?: string;
-};
-
-type getUserDataResponse = postUserAuthenticateResponse;
-
-type postUserRecoveryPasswordResponse = {
-  message?: string;
-  requisitionId?: string;
-};
-
-type postCheckRedefinePasswordTokenResponse = postUserRecoveryPasswordResponse;
-
-type postRedefinePasswordResponse = postUserRecoveryPasswordResponse;
-
-export const postUserAuthenticate = async ({
-  email,
-  password,
-}: userData): Promise<postUserAuthenticateResponse> => {
+export const postUserAuthenticate = async ({ email, password }: userData) => {
   if (!email || !password) throw new Error('No user or email found');
 
   const response = await fetch('/api/signin', {
@@ -47,9 +31,7 @@ export const postUserAuthenticate = async ({
   return response.json();
 };
 
-export const getUserData = async (
-  token: string,
-): Promise<getUserDataResponse> => {
+export const getUserData = async (token: string) => {
   const response = await fetch('/api/user', {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -58,9 +40,7 @@ export const getUserData = async (
   return response.json();
 };
 
-export const postUserRecoveryPassword = async (
-  email: string,
-): Promise<postUserRecoveryPasswordResponse> => {
+export const postUserRecoveryPassword = async (email: string) => {
   const response = await fetch('/api/recoverPassword', {
     method: 'POST',
     headers: {
@@ -75,7 +55,7 @@ export const postUserRecoveryPassword = async (
 
 export const postCheckRedefinePasswordToken = async (
   token: string,
-): Promise<postCheckRedefinePasswordTokenResponse> => {
+): Promise<authPasswordTokenData> => {
   const response = await fetch('/api/checkRedefinePasswordToken', {
     method: 'POST',
     headers: {
@@ -90,7 +70,7 @@ export const postCheckRedefinePasswordToken = async (
 
 export const postRedefinePassword = async (
   data: PasswordData,
-): Promise<postRedefinePasswordResponse> => {
+): Promise<authPasswordTokenData> => {
   const response = await fetch('/api/redefinePassword', {
     method: 'POST',
     headers: {
